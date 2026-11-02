@@ -4,18 +4,20 @@
 
 目标是把一个有明确验收标准的任务推进到可审查、可验收、可按规则合并的 GitHub PR。首个可用版本针对单个配置仓库、一个控制器实例和已有 CI，支持多个隔离编码任务；同仓库合并由一个控制器协调。
 
-本次交付 M0：Rust workspace、共享契约、无副作用的本地流程判断和 CLI。后续模块在本文说明职责与验收边界，尚未建立网络服务、数据库或执行引擎。
+当前包含 M0 与 M1：Rust workspace、共享契约、无副作用的本地流程判断、GitHub GET 观察和本地 SQLite 任务/事件存储。尚未建立 Webhook 服务或 Agent 执行引擎。
 
 ## 模块与依赖
 
 ```text
-scion-cli                       当前：本地 JSON 入口
+scion-cli                       当前：JSON 判断、只读观察、任务/历史入口
     └── scion-orchestrator      当前：纯函数 assess(snapshot)
             └── scion-core      当前：Candidate / Evidence / Assessment
 
-后续适配器，均依赖领域契约而不进入核心：
-    GitHub adapter              PR、审查、检查、候选版本、合并接口
-    Task store                  SQLite 事件、尝试、幂等键、制品清单
+M1 已实现，均依赖领域契约而不进入核心：
+    scion-github                PR/检查/审查/required checks 元数据，只读 GET
+    scion-store                 SQLite queued 规格、观察事件和最新记录指针
+
+后续执行适配器：
     Agent runner                Git worktree + 隔离容器中的编码执行
     Review runner               独立审查、结构化发现、版本绑定
     Acceptance runner           既定真实流程与可复核证据
@@ -28,14 +30,14 @@ GitHub/Git 保持唯一代码权威来源；SQLite 保存 Scion 自己的任务�
 
 ## 一次交付的数据
 
-- `Task`：目标仓库、目标分支、需求、允许修改范围、验收用例、执行预算、任务所有者。M1 引入持久化契约。
+- `TaskSpec`：目标仓库、目标分支、需求、允许修改路径、验收要求、执行预算、所有者。M1 保存不可变规格并显示 queued；M2 才执行和关联 PR。
 - `Attempt`：任务的某次尝试、工作区、编码执行身份、提交、日志和退出原因。每次修复是新尝试，旧证据保留。
 - `Candidate`：`repository + pull_request + head_sha + base_sha + merge_sha + policy_sha`。候选合并版本与策略版本均固定到完整提交 ID。
 - `Evidence`：候选版本、类别、PASS/FAIL/BLOCKED/NOT_RUN、执行者、制品入口。三个类别是独立审查、CI 汇总、真实验收。
 - `Assessment`：满足哪些输入条件、阻塞原因；M0 输出固定为 dry-run，既不认证证据，也不授予合并权限。
 - `MergeReceipt`：M5 引入，保存实际合并提交、被检查的候选版本、GitHub 结果与审计记录。发布部署另走授权流程。
 
-M0 接受一个 CI 汇总报告；未来 GitHub 适配器必须从可信检查来源聚合**所有配置的 required checks**。不能用任意同名 check 或 PR 正文中的“CI 通过”替代。
+M0 接受调用者输入的 CI 汇总报告。M1 从实际 API 读取传统保护与 active ruleset 中的 required checks，按 context + GitHub App ID 汇总 PR head 上的检查，未知来源或配置缺失保持 BLOCKED。它不把观察自动转换为完整 Candidate 的验收收据；M3—M5 仍需验证流程定义、实际候选构建、独立审查权限和真实验收。不能用任意同名 check 或 PR 正文中的“CI 通过”替代。
 
 首版对三类证据保守采用相同完整版本绑定。头提交、基线、候选合并提交或策略任一变化，旧证据失效；审查复用优化另行设计。
 
@@ -48,7 +50,7 @@ queued -> coding -> pr_open -> checking -> accepting -> ready_to_merge
 修复后创建新 attempt，重新固定候选版本和所需检查
 ```
 
-这是 M1—M5 的目标状态机，M0 仅实现 checking/accepting 结果的本地综合判断。每次推进保存输入、版本和结果；Webhook 重复投递按 delivery ID 去重，外部副作用使用稳定幂等键。
+这是 M1—M5 的目标状态机。M0 实现本地综合判断，M1 保存 queued 规格和只读观察任务，不执行 coding/merging。CLI 每次 poll 使用调用者提供的 ID 去重；签名 Webhook 接收与自动调度尚未实现。后续外部副作用使用稳定幂等键。
 
 遇到未知检查状态、失联、超时或证据缺失，进入 BLOCKED；真实失败进入 FAIL；没有执行进入 NOT_RUN。不能把 skipped/neutral 自动转换成 PASS。重试保留第一次错误和尝试次数，达到预算后停止，供用户处理。
 

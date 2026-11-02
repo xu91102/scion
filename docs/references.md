@@ -14,5 +14,6 @@
 - [GitHub：管理 merge queue](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue)：队列可用条件、候选版本与 `merge_group` 工作流。
 - [GitHub：Securely using pull_request_target](https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target)：不可信 PR 代码与高权限执行上下文的隔离。
 - [GitHub 注册入口](https://github.com/signup)与[创建仓库说明](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository)：普通 owner 格式、仓库名称允许字符与 100 字符上限。
+- M1 使用 [PR API](https://docs.github.com/en/rest/pulls/pulls)、[检查 API](https://docs.github.com/en/rest/checks/runs)、[传统状态 API](https://docs.github.com/en/rest/commits/statuses#list-commit-statuses-for-a-reference)、[审查 API](https://docs.github.com/en/rest/pulls/reviews)、[传统分支保护 API](https://docs.github.com/en/rest/branches/branch-protection) 和 [active branch rules API](https://docs.github.com/en/rest/repos/rules#get-rules-for-a-branch)；GET 请求的 API 版本为 2026-03-10。
 
 平台能力可能变化，开始实现外部适配时再次核对官方契约及目标仓库实际设置。仓库名称 Scion 仅为本开源项目名称，不表示与 Anthropic 或上述参考项目存在隶属关系。

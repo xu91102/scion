@@ -2,6 +2,10 @@
 
 use serde::{Deserialize, Serialize};
 
+pub mod observation;
+pub mod task;
+pub mod validation;
+
 /// Exact code and policy revision to which a report applies.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
