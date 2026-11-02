@@ -1,0 +1,7 @@
+/target/
+/tmp/
+/.env
+/.env.*
+/docs/superpowers/
+*.log
+.DS_Store

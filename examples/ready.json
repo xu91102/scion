@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "candidate": {
+    "repository": "example/project",
+    "pull_request": 42,
+    "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "merge_sha": "cccccccccccccccccccccccccccccccccccccccc",
+    "policy_sha": "dddddddddddddddddddddddddddddddddddddddd"
+  },
+  "coding_actor": "coding-agent",
+  "policy": {
+    "auto_merge": true,
+    "require_human_approval": false
+  },
+  "human_approved": false,
+  "evidence": [
+    {
+      "gate": "review",
+      "outcome": "PASS",
+      "candidate": {
+        "repository": "example/project",
+        "pull_request": 42,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "merge_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "policy_sha": "dddddddddddddddddddddddddddddddddddddddd"
+      },
+      "producer": "review-worker",
+      "artifact": "https://example.invalid/evidence/review"
+    },
+    {
+      "gate": "ci",
+      "outcome": "PASS",
+      "candidate": {
+        "repository": "example/project",
+        "pull_request": 42,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "merge_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "policy_sha": "dddddddddddddddddddddddddddddddddddddddd"
+      },
+      "producer": "ci-worker",
+      "artifact": "https://example.invalid/evidence/ci"
+    },
+    {
+      "gate": "acceptance",
+      "outcome": "PASS",
+      "candidate": {
+        "repository": "example/project",
+        "pull_request": 42,
+        "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "base_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "merge_sha": "cccccccccccccccccccccccccccccccccccccccc",
+        "policy_sha": "dddddddddddddddddddddddddddddddddddddddd"
+      },
+      "producer": "acceptance-worker",
+      "artifact": "https://example.invalid/evidence/acceptance"
+    }
+  ]
+}

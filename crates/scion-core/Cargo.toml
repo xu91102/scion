@@ -1,0 +1,15 @@
+[package]
+name = "scion-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+description = "Experimental delivery snapshots and evidence contracts for Scion"
+
+[dependencies]
+serde.workspace = true
+
+[lints]
+workspace = true
