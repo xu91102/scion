@@ -1,0 +1,15 @@
+[package]
+name = "scion-orchestrator"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+description = "Offline delivery assessment; no execution or GitHub write capability"
+
+[dependencies]
+scion-core.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,23 @@
+[workspace]
+resolver = "3"
+members = ["crates/scion-core", "crates/scion-orchestrator", "crates/scion-cli"]
+
+[workspace.package]
+version = "0.0.1"
+edition = "2024"
+rust-version = "1.98"
+license = "Apache-2.0"
+repository = "https://github.com/xu91102/scion"
+publish = false
+
+[workspace.dependencies]
+scion-core = { path = "crates/scion-core" }
+scion-orchestrator = { path = "crates/scion-orchestrator" }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.154"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[profile.dev]
+debug = 1
