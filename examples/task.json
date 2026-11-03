@@ -1,0 +1,17 @@
+{
+  "id": "csv-export",
+  "repository": "example/project",
+  "target_branch": "main",
+  "goal": "Add CSV export to the demo page",
+  "allowed_paths": [
+    "src",
+    "tests"
+  ],
+  "acceptance_criteria": [
+    "The browser downloads a CSV file with the expected header",
+    "Empty data produces a valid header-only CSV"
+  ],
+  "owner": "operator",
+  "max_attempts": 2,
+  "timeout_seconds": 300
+}

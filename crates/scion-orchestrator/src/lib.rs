@@ -1,5 +1,7 @@
 //! Pure, offline delivery assessment over the shared contracts.
 
+use scion_core::validation::{valid_repository, valid_sha};
+
 use scion_core::{Assessment, Blocker, BlockerCode, Decision, DeliverySnapshot, Gate, Outcome};
 
 /// Assess supplied facts without contacting GitHub or executing commands.
@@ -110,40 +112,7 @@ fn valid_candidate(candidate: &scion_core::Candidate) -> bool {
             &candidate.policy_sha,
         ]
         .iter()
-        .all(|sha| {
-            matches!(sha.len(), 40 | 64)
-                && sha
-                    .bytes()
-                    .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
-        })
-}
-
-fn valid_repository(repository: &str) -> bool {
-    let Some((owner, name)) = repository.split_once('/') else {
-        return false;
-    };
-    let valid_owner = !owner.is_empty()
-        && owner.len() <= 39
-        && owner
-            .as_bytes()
-            .first()
-            .is_some_and(u8::is_ascii_alphanumeric)
-        && owner
-            .as_bytes()
-            .last()
-            .is_some_and(u8::is_ascii_alphanumeric)
-        && !owner.contains("--")
-        && owner
-            .bytes()
-            .all(|b| b.is_ascii_alphanumeric() || b == b'-');
-    valid_owner
-        && !name.is_empty()
-        && name.len() <= 100
-        && name != "."
-        && name != ".."
-        && name
-            .bytes()
-            .all(|b| b.is_ascii_alphanumeric() || b"-_.".contains(&b))
+        .all(|sha| valid_sha(sha))
 }
 
 fn valid_actor(actor: &str) -> bool {

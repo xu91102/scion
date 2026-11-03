@@ -103,3 +103,96 @@ fn missing_file_or_arguments_do_not_report_ready() {
         assert!(output.stdout.is_empty());
     }
 }
+
+#[test]
+fn persisted_observation_is_read_in_a_new_cli_process_without_claiming_freshness() {
+    use scion_core::{
+        Outcome,
+        observation::{Observation, Revision},
+    };
+    let input = TestInput::new(&[]);
+    let observation = Observation {
+        schema_version: 1,
+        revision: Revision {
+            repository: "example/project".into(),
+            pull_request: 42,
+            head_sha: "a".repeat(40),
+            base_sha: "b".repeat(40),
+            merge_sha: None,
+        },
+        state: "open".into(),
+        draft: false,
+        author_id: 1,
+        base_branch: "main".into(),
+        stable: true,
+        protection_known: false,
+        required_checks: vec![],
+        checks: vec![],
+        reviews: vec![],
+        commit_statuses: vec![],
+        head_ci: Outcome::Blocked,
+        review_policy: Outcome::NotRun,
+        issues: vec![],
+    };
+    let mut store = scion_store::Store::open(&input.0).expect("open");
+    store.record("one", &observation).expect("record");
+    drop(store);
+    let output = Command::new(env!("CARGO_BIN_EXE_scion"))
+        .arg("history")
+        .arg(&input.0)
+        .args(["example/project", "42"])
+        .output()
+        .expect("run history");
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).expect("report");
+    assert_eq!(report["mode"], "cached_history");
+    assert_eq!(report["github_observed"], false);
+    assert_eq!(report["evidence_verified"], false);
+    assert_eq!(report["merge_performed"], false);
+    assert_eq!(report["records"][0]["delivery_id"], "one");
+}
+
+#[test]
+fn task_creation_and_new_process_readback_keep_the_task_queued() {
+    let input = TestInput::new(&[]);
+    let database = input.0.parent().expect("directory").join("tasks.sqlite");
+    let output = Command::new(env!("CARGO_BIN_EXE_scion"))
+        .arg("task-create")
+        .arg(example("task.json"))
+        .arg(&database)
+        .output()
+        .expect("create process");
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let output = Command::new(env!("CARGO_BIN_EXE_scion"))
+        .arg("task-show")
+        .arg(&database)
+        .arg("csv-export")
+        .output()
+        .expect("new read process");
+    assert!(output.status.success());
+    let value: serde_json::Value = serde_json::from_slice(&output.stdout).expect("JSON");
+    assert_eq!(value["task"]["state"], "queued");
+    assert_eq!(value["task"]["spec"]["max_attempts"], 2);
+    assert_eq!(value["merge_performed"], false);
+    assert_eq!(value["github_observed"], false);
+}
+
+#[test]
+fn task_errors_are_labeled_as_local_operations() {
+    let output = Command::new(env!("CARGO_BIN_EXE_scion"))
+        .arg("task-create")
+        .output()
+        .expect("error process");
+    assert_eq!(output.status.code(), Some(2));
+    let value: serde_json::Value = serde_json::from_slice(&output.stderr).expect("JSON error");
+    assert_eq!(value["mode"], "local_task_error");
+    assert_eq!(value["merge_performed"], false);
+}
