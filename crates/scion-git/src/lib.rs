@@ -1,5 +1,6 @@
 //! Managed Git object storage and worktrees.
 
+mod agent;
 mod process;
 use scion_core::{validation::valid_sha, workspace::Workspace};
 use std::{

@@ -10,6 +10,7 @@ use std::{
     process::ExitCode,
 };
 
+mod agent;
 mod workspaces;
 
 const MAX_INPUT_BYTES: u64 = 1024 * 1024;
@@ -22,6 +23,7 @@ fn run() -> Result<u8, Box<dyn Error>> {
         Some("task-create") => return task_create(&all[1..]),
         Some("task-show") => return task_show(&all[1..]),
         Some(command) if workspace_command(command) => return workspaces::run(command, &all[1..]),
+        Some(command) if agent::command(command) => return agent::run(command, &all[1..]),
         _ => {}
     }
     let mut args = all.into_iter();
@@ -170,6 +172,7 @@ fn main() -> ExitCode {
         Some("observe" | "history") => "read_only_error",
         Some("task-create" | "task-show") => "local_task_error",
         Some(command) if workspace_command(command) => "workspace_error",
+        Some(command) if agent::command(command) => "agent_error",
         _ => "dry_run",
     };
     match run() {
