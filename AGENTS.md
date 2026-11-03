@@ -1,7 +1,7 @@
 # Scion development
 
 - Stack: Rust 1.98.0, Cargo workspace. GitHub/Git owns code, refs, PRs and CI results.
-- Current milestone: M1 read-only observations and local task/event persistence. Keep implementation status explicit.
+- Current milestone: M2 workspace coordination. Agent execution and PR publishing are later steps. Keep implementation status explicit.
 - `scion-core` owns data contracts; `scion-orchestrator` owns pure decisions; `scion-cli` owns input/output.
 - No core dependency on HTTP, a model provider, a process runner or GitHub credentials.
 - `scion-github` exposes GET-only observation; `scion-store` owns parameterized SQLite transactions. Never store tokens or PR/review bodies.

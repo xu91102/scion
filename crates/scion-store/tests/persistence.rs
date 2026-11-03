@@ -125,7 +125,7 @@ fn foreign_or_newer_databases_are_not_initialized_over() {
     let own = TestDb::new();
     drop(Store::open(&own.0).expect("own"));
     let conn = rusqlite::Connection::open(&own.0).expect("sqlite");
-    conn.pragma_update(None, "user_version", 2)
+    conn.pragma_update(None, "user_version", 3)
         .expect("future version");
     drop(conn);
     assert!(matches!(

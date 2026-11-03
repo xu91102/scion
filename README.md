@@ -68,3 +68,5 @@ cargo run --locked -p scion-cli -- history tmp/scion.sqlite xu91102/scion 1
 
 本仓库与 Anthropic、CarterT27 没有隶属关系。参考来源、固定版本和技术取舍见 [参考说明](docs/references.md)。许可证：[Apache-2.0](LICENSE)。
 Rust foundation for agent coding, PR review, CI, real acceptance and controlled merging on GitHub/Git.
+
+团队可用 [M2 工作区协调](docs/m2-workspaces.md) 在现有仓库准备独立任务、处理目录占用与组合预检。
