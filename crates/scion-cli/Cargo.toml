@@ -13,6 +13,7 @@ name = "scion"
 path = "src/main.rs"
 
 [dependencies]
+scion-coordinator.workspace = true
 scion-core.workspace = true
 scion-orchestrator.workspace = true
 scion-github.workspace = true

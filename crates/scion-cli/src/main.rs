@@ -10,6 +10,8 @@ use std::{
     process::ExitCode,
 };
 
+mod workspaces;
+
 const MAX_INPUT_BYTES: u64 = 1024 * 1024;
 
 fn run() -> Result<u8, Box<dyn Error>> {
@@ -19,6 +21,7 @@ fn run() -> Result<u8, Box<dyn Error>> {
         Some("history") => return history(&all[1..]),
         Some("task-create") => return task_create(&all[1..]),
         Some("task-show") => return task_show(&all[1..]),
+        Some(command) if workspace_command(command) => return workspaces::run(command, &all[1..]),
         _ => {}
     }
     let mut args = all.into_iter();
@@ -148,11 +151,25 @@ fn history(args: &[OsString]) -> Result<u8, Box<dyn Error>> {
     Ok(0)
 }
 
+fn workspace_command(command: &str) -> bool {
+    matches!(
+        command,
+        "project-register"
+            | "state-upgrade"
+            | "workspace-prepare"
+            | "workspace-show"
+            | "workspace-preflight"
+            | "workspace-release"
+            | "workspace-recover"
+    )
+}
+
 fn main() -> ExitCode {
     let command = std::env::args_os().nth(1);
     let mode = match command.as_deref().and_then(|s| s.to_str()) {
         Some("observe" | "history") => "read_only_error",
         Some("task-create" | "task-show") => "local_task_error",
+        Some(command) if workspace_command(command) => "workspace_error",
         _ => "dry_run",
     };
     match run() {

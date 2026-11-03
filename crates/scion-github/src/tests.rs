@@ -33,6 +33,7 @@ impl Server {
                     thread::sleep(Duration::from_millis(2));
                     continue;
                 };
+                stream.set_nonblocking(false).expect("blocking stream");
                 stream
                     .set_read_timeout(Some(Duration::from_secs(2)))
                     .expect("timeout");

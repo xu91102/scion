@@ -9,6 +9,8 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
+mod workspace;
+
 const APPLICATION_ID: i64 = 0x5343494f;
 
 /// Public storage failures, retaining a clear source without printing credentials.
@@ -22,6 +24,16 @@ pub enum StoreError {
     Json(#[from] serde_json::Error),
     #[error("unsupported or foreign database")]
     UnsupportedDatabase,
+    #[error("schema 1 requires state-upgrade")]
+    UpgradeRequired,
+    #[error("{0}")]
+    Coordination(String),
+    #[error("path overlap with task {task}: {path} and {occupied_path}")]
+    PathOverlap {
+        task: String,
+        path: String,
+        occupied_path: String,
+    },
     #[error("delivery ID was already used with different observation data")]
     DeliveryConflict,
     #[error("invalid observation or delivery ID")]
@@ -148,8 +160,11 @@ impl Store {
                 CREATE TABLE tasks (repository TEXT NOT NULL, pr_number INTEGER NOT NULL, current_event TEXT NOT NULL REFERENCES events(delivery_id), PRIMARY KEY(repository, pr_number));
                 CREATE TABLE task_specs (task_id TEXT PRIMARY KEY, payload TEXT NOT NULL, created_at INTEGER NOT NULL);")?;
             tx.pragma_update(None, "application_id", APPLICATION_ID)?;
-            tx.pragma_update(None, "user_version", 1)?;
-        } else if app != APPLICATION_ID || version != 1 {
+            tx.execute_batch(workspace::SCHEMA)?;
+            tx.pragma_update(None, "user_version", 2)?;
+        } else if app == APPLICATION_ID && version == 1 {
+            return Err(StoreError::UpgradeRequired);
+        } else if app != APPLICATION_ID || version != 2 {
             return Err(StoreError::UnsupportedDatabase);
         }
         tx.commit()?;

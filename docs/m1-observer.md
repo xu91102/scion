@@ -36,6 +36,8 @@ required checks 合并自传统分支保护和 active rulesets。每项必须在
 
 ## SQLite 和事件
 
+使用 M2 程序读取原 schema 1 数据库前，先执行 [显式升级](m2-workspaces.md#升级和回退)。以下为 M1 的数据库格式。
+
 数据库标记为 Scion application ID、schema 1。仅初始化空的新库，拒绝含其他对象的未标记库、不同标记或未知版本，禁止自动覆盖和降级。新建文件在 Unix 上为 0600；已有文件的权限由操作者管理。
 
 - `task_specs` 保存任务规格、预算与创建时间，同一 ID 重复同样规格可读回，内容不同报冲突。queued 代表尚未执行，不代表 GitHub 仓库/执行权限已经验证。

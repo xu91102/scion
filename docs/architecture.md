@@ -4,7 +4,7 @@
 
 目标是把一个有明确验收标准的任务推进到可审查、可验收、可按规则合并的 GitHub PR。首个可用版本针对单个配置仓库、一个控制器实例和已有 CI，支持多个隔离编码任务；同仓库合并由一个控制器协调。
 
-当前包含 M0 与 M1：Rust workspace、共享契约、无副作用的本地流程判断、GitHub GET 观察和本地 SQLite 任务/事件存储。尚未建立 Webhook 服务或 Agent 执行引擎。
+当前包含 M0、M1 与 M2 的工作区协调部分。已有能力包括Rust workspace、共享契约、无副作用的本地流程判断、GitHub GET 观察和本地 SQLite 任务/事件存储。M2 新增共享 Git 对象库、独立 worktree、目录占用与组合预检。常驻服务和 Agent 执行引擎仍在后续范围。
 
 ## 模块与依赖
 
@@ -16,6 +16,10 @@ scion-cli                       当前：JSON 判断、只读观察、任务/历
 M1 已实现，均依赖领域契约而不进入核心：
     scion-github                PR/检查/审查/required checks 元数据，只读 GET
     scion-store                 SQLite queued 规格、观察事件和最新记录指针
+
+M2 工作区协调：
+    scion-coordinator           占用、预检与操作恢复
+    scion-git                   共享对象库与工作区操作
 
 后续执行适配器：
     Agent runner                Git worktree + 隔离容器中的编码执行

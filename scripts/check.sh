@@ -12,3 +12,4 @@ target/debug/scion evaluate examples/blocked.json
 result=$?
 set -e
 test "$result" -eq 3
+python3 scripts/check-workspaces.py target/debug/scion

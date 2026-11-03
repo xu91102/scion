@@ -115,3 +115,5 @@ pub struct Assessment {
     pub candidate: Candidate,
     pub blockers: Vec<Blocker>,
 }
+
+pub mod workspace;
