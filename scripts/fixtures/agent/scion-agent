@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+if grep -q '"goal": "success"' /run/scion-task; then
+  printf '%s\n' fixture-ok > tasks/success
+elif grep -q '"goal": "outside"' /run/scion-task; then
+  printf '%s\n' out > outside
+elif grep -q '"goal": "quota"' /run/scion-task; then
+  dd if=/dev/zero of=tasks/quota bs=1048576 count=80
+elif grep -q '"goal": "credential"' /run/scion-task; then
+  cp /run/scion-auth tasks/credential
+else
+  touch started
+  sleep 60
+fi

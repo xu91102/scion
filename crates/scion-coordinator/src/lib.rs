@@ -273,6 +273,14 @@ impl Coordinator {
         let git = self.git(&project)?;
         let _guard = self.lock_workspace(&project, &w)?;
         let mut w = self.workspace(task)?;
+        if self.agent_attempts(task)?.last().is_some_and(|attempt| {
+            matches!(
+                attempt.phase,
+                scion_core::attempt::Phase::Running | scion_core::attempt::Phase::CancelRequested
+            )
+        }) {
+            return Err("Agent attempt must stop before workspace release".into());
+        }
         if w.phase == Phase::Released {
             return Ok(w);
         }
@@ -425,3 +433,5 @@ fn write_identity(root: &Path, marker: &Path, value: &str) -> Result<()> {
     fs::rename(temporary, marker)?;
     Ok(())
 }
+
+mod agent;

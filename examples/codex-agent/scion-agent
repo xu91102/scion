@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+export HOME=/tmp/scion-home
+export CODEX_HOME="$HOME/.codex"
+mkdir -p "$CODEX_HOME"
+chmod 700 "$CODEX_HOME"
+if [ -f /run/scion-auth ]; then
+  umask 077
+  cp /run/scion-auth "$CODEX_HOME/auth.json"
+fi
+exec codex -a never exec --ephemeral --ignore-user-config --skip-git-repo-check --sandbox danger-full-access --json -C /work - < /run/scion-task

@@ -52,6 +52,15 @@ pub(crate) fn run(
     args: &[&OsStr],
     network: bool,
 ) -> Result<(Option<i32>, Vec<u8>), Error> {
+    run_index(dir, args, network, None)
+}
+
+pub(crate) fn run_index(
+    dir: &Path,
+    args: &[&OsStr],
+    network: bool,
+    index: Option<&Path>,
+) -> Result<(Option<i32>, Vec<u8>), Error> {
     let mut capture = Capture::new()?;
     let mut command = Command::new("git");
     for (key, _) in std::env::vars_os() {
@@ -88,6 +97,9 @@ pub(crate) fn run(
         .stdin(Stdio::null())
         .stderr(Stdio::null())
         .stdout(capture.file.try_clone()?);
+    if let Some(index) = index {
+        command.env("GIT_INDEX_FILE", index);
+    }
     if !network {
         command.env("GIT_CONFIG_GLOBAL", "/dev/null");
     }

@@ -4,7 +4,7 @@
 
 目标是把一个有明确验收标准的任务推进到可审查、可验收、可按规则合并的 GitHub PR。首个可用版本针对单个配置仓库、一个控制器实例和已有 CI，支持多个隔离编码任务；同仓库合并由一个控制器协调。
 
-当前包含 M0、M1 与 M2 的工作区协调部分。已有能力包括Rust workspace、共享契约、无副作用的本地流程判断、GitHub GET 观察和本地 SQLite 任务/事件存储。M2 新增共享 Git 对象库、独立 worktree、目录占用与组合预检。常驻服务和 Agent 执行引擎仍在后续范围。
+当前包含 M0、M1 与 M2。已有能力包括 Rust workspace、共享契约、无副作用的本地流程判断、GitHub GET 观察和本地 SQLite 任务/事件存储。M2 新增共享 Git 对象库、独立 worktree、目录占用与组合预检。本机 Docker Agent 使用独立快照、尝试预算、取消和草稿 PR 发布。
 
 ## 模块与依赖
 
@@ -20,9 +20,9 @@ M1 已实现，均依赖领域契约而不进入核心：
 M2 工作区协调：
     scion-coordinator           占用、预检与操作恢复
     scion-git                   共享对象库与工作区操作
+    Agent 执行与发布             私有快照、受限容器、候选提交、GitHub 草稿 PR
 
 后续执行适配器：
-    Agent runner                Git worktree + 隔离容器中的编码执行
     Review runner               独立审查、结构化发现、版本绑定
     Acceptance runner           既定真实流程与可复核证据
     Merge controller            权威状态重读、规则确认、合并、结果记录

@@ -117,3 +117,5 @@ pub struct Assessment {
 }
 
 pub mod workspace;
+
+pub mod attempt;

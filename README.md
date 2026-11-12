@@ -70,3 +70,5 @@ cargo run --locked -p scion-cli -- history tmp/scion.sqlite xu91102/scion 1
 Rust foundation for agent coding, PR review, CI, real acceptance and controlled merging on GitHub/Git.
 
 团队可用 [M2 工作区协调](docs/m2-workspaces.md) 在现有仓库准备独立任务、处理目录占用与组合预检。
+
+[M2 Agent 运行与任务 PR](docs/m2-agent.md) 说明容器执行、预算、取消和草稿 PR 的接入方式。
